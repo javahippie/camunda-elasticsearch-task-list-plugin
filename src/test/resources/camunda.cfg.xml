@@ -11,7 +11,7 @@
     </property>
     <property name="processEnginePlugins">
       <list>
-        <bean class="de.javahippie.camunda.MySampleProcessEnginePlugin" />
+        <bean class="de.javahippie.camunda.listener.ElasticSearchTaskProcessEnginePlugin" />
       </list>
     </property>
   </bean>
