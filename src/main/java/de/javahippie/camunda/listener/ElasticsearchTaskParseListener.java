@@ -18,32 +18,40 @@ import org.elasticsearch.client.Client;
 public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener implements BpmnParseListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskParseListener.class.getName());
-    private final Client elasticsearchClient;
+    private ElasticClientBuilder elasticsearchClientBuilder;
 
-    public ElasticsearchTaskParseListener() throws UnknownHostException {
-        this.elasticsearchClient = ElasticClientBuilder.create()
-                .clusterName("docker-cluster")
-                .domainName("localhost")
-                .port(9200)
-                .build();
+    public void setElasticsearchClientBuilder(ElasticClientBuilder elasticsearchClientBuilder) {
+        this.elasticsearchClientBuilder = elasticsearchClientBuilder;
+    }
+
+    public ElasticClientBuilder getElasticsearchClientBuilder() {
+        return elasticsearchClientBuilder;
     }
 
     @Override
     public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
-        LOGGER.info("Adding Task Listener to User Task:"
-                + " activityId=" + activity.getId()
-                + ", activityName='" + activity.getName() + "'"
-                + ", scopeId=" + scope.getId()
-                + ", scopeName=" + scope.getName());
+        try {
+            Client elasticSearchClient = elasticsearchClientBuilder.build();
+            LOGGER.info("Adding Task Listener to User Task:"
+                    + " activityId=" + activity.getId()
+                    + ", activityName='" + activity.getName() + "'"
+                    + ", scopeId=" + scope.getId()
+                    + ", scopeName=" + scope.getName());
 
-        ActivityBehavior behavior = activity.getActivityBehavior();
-        if (behavior instanceof UserTaskActivityBehavior) {
-            TaskDefinition taskDefinition = ((UserTaskActivityBehavior) behavior).getTaskDefinition();
-            taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(elasticsearchClient));
-            taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(elasticsearchClient));
-            taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(elasticsearchClient));
-            taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(elasticsearchClient));
+            ActivityBehavior behavior = activity.getActivityBehavior();
+            if (behavior instanceof UserTaskActivityBehavior) {
+                TaskDefinition taskDefinition = ((UserTaskActivityBehavior) behavior).getTaskDefinition();
+                taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(elasticSearchClient));
+                taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(elasticSearchClient));
+                taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(elasticSearchClient));
+                taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(elasticSearchClient));
+            }
+        } catch (UnknownHostException e) {
+            //FIXME: uncool
+            throw new RuntimeException(e);
         }
+
+
     }
 
 }

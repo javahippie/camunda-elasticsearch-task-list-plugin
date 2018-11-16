@@ -19,19 +19,6 @@ public class ElasticClientBuilder {
     private String domainName;
     private int port;
 
-    private ElasticClientBuilder() {
-        //We don't want to instantiate this by hand
-    }
-
-    /**
-     * Creates an instance of this builder
-     *
-     * @return an instance of ElasticClientBuilder
-     */
-    public static ElasticClientBuilder create() {
-        return new ElasticClientBuilder();
-    }
-
     /**
      * Set the clustername, matching the 'cluster.name' variable of your Elasticsearch instance
      *

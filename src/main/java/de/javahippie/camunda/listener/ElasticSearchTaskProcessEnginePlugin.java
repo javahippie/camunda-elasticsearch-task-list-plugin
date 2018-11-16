@@ -1,29 +1,32 @@
 package de.javahippie.camunda.listener;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
+import de.javahippie.camunda.elasticsearch.ElasticClientBuilder;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin {
+
+    private ElasticClientBuilder builder;
 
     @Override
     public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
         List<BpmnParseListener> postParseListeners = processEngineConfiguration.getCustomPostBPMNParseListeners();
         if (postParseListeners == null) {
-            postParseListeners = new ArrayList<BpmnParseListener>();
+            postParseListeners = new ArrayList<>();
             processEngineConfiguration.setCustomPostBPMNParseListeners(postParseListeners);
         }
-        //FIXME: Swallowing the exception is not ideal
-        try {
-            postParseListeners.add(new ElasticsearchTaskParseListener());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        ElasticsearchTaskParseListener listener = new ElasticsearchTaskParseListener();
+        listener.setElasticsearchClientBuilder(builder
+                .clusterName("docker-cluster")
+                .domainName("localhost")
+                .port(9300));
+        postParseListeners.add(listener);
     }
 
     @Override
@@ -36,4 +39,7 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
         //Nothing to do
     }
 
+    public void setBuilder(ElasticClientBuilder builder) {
+        this.builder = builder;
+    }
 }

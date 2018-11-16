@@ -1,48 +1,102 @@
 package de.javahippie.camunda;
 
+import de.javahippie.camunda.elasticsearch.MockedElasticClientBuilder;
+import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.apache.ibatis.logging.LogFactory;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
-import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.junit.Assert.*;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
  */
+@RunWith(MockitoJUnitRunner.class)
 public class InMemoryH2Test {
 
-  @ClassRule
-  @Rule
-  public static ProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create().build();
+    @ClassRule
+    @Rule
+    public static ProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create().build();
 
-  private static final String PROCESS_DEFINITION_KEY = "elasticsearch-task-plugin";
+    private static final String PROCESS_DEFINITION_KEY = "elasticsearch-task-plugin";
 
-  static {
-    LogFactory.useSlf4jLogging(); // MyBatis
-  }
+    static {
+        LogFactory.useSlf4jLogging(); // MyBatis
+    }
 
-  @Before
-  public void setup() {
-    init(rule.getProcessEngine());
-  }
+    private MockedElasticClientBuilder builder;
 
-  @Test
-  @Deployment(resources = "process.bpmn")
-  public void testHappyPath() {
-	  ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+    @Before
+    public void setup() throws UnknownHostException {
+        Optional<BpmnParseListener> parseListener = rule.getProcessEngineConfiguration()
+                .getCustomPostBPMNParseListeners()
+                .stream()
+                .filter(bpmnParseListener -> bpmnParseListener instanceof ElasticsearchTaskParseListener)
+                .findFirst();
 
-	  assertThat(processInstance).task("Task_DoSomething");
-	  
-	  complete(task());
-	  
-	  assertThat(processInstance).isEnded();
-  }
+        ElasticsearchTaskParseListener listener = (ElasticsearchTaskParseListener) parseListener.get();
+        this.builder = (MockedElasticClientBuilder) listener.getElasticsearchClientBuilder();
 
+        init(rule.getProcessEngine());
+    }
+
+    @Test
+    @Deployment(resources = "process.bpmn")
+    public void testHappyPath() {
+        ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
+
+        assertThat(processInstance).task("Task_DoSomething");
+
+
+        Mockito.verify(builder.client.irb, Mockito.times(1)).setSource(explodedMap("taskName", "Do something", "assignee", "demo"));
+        Mockito.verify(builder.client.irb, Mockito.times(1)).request();
+        Mockito.verify(builder.client.urb, Mockito.times(1)).setDoc(explodedMap("taskName", "Do something", "assignee", "demo"));
+        Mockito.verify(builder.client.urb, Mockito.times(1)).request();
+
+        complete(task());
+
+        Mockito.verify(builder.client.drb, Mockito.times(1)).request();
+
+        assertThat(processInstance).task("Task_DoSomethingElse");
+
+        Mockito.verify(builder.client.irb, Mockito.times(1)).setSource(explodedMap("taskName", "Do something else", "assignee", "demo"));
+        Mockito.verify(builder.client.irb, Mockito.times(2)).request();
+        Mockito.verify(builder.client.urb, Mockito.times(1)).setDoc(explodedMap("taskName", "Do something else", "assignee", "demo"));
+        Mockito.verify(builder.client.urb, Mockito.times(2)).request();
+
+        taskService().setAssignee(task().getId(), "john");
+        assertThat(task()).isAssignedTo("john");
+
+        Mockito.verify(builder.client.urb, Mockito.times(1)).setDoc(explodedMap("taskName", "Do something else", "assignee", "john"));
+        Mockito.verify(builder.client.urb, Mockito.times(3)).request();
+
+        processEngine().getRuntimeService().deleteProcessInstance(processInstance.getId(), "deleted for test reasons");
+
+        Mockito.verify(builder.client.drb, Mockito.times(2)).request();
+
+        assertThat(processInstance).isEnded();
+    }
+
+    private Map<String, Object> explodedMap(String... content) {
+        Map<String, Object> map = new HashMap<>();
+        for (int i = 0; i < content.length; i = i + 2) {
+            map.put(content[i], content[i + 1]);
+        }
+        return map;
+    }
 }
