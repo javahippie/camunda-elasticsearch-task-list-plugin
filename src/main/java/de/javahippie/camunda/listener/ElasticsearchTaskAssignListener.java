@@ -7,6 +7,10 @@ import org.elasticsearch.client.Client;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * Updates an existing document with the taskId as ID every time when a task is assigned.
+ * Also fires, when a task is created and immediately assigned!
+ */
 public class ElasticsearchTaskAssignListener extends AbstractElasticsearchTaskListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskAssignListener.class.getName());

@@ -9,9 +9,9 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 /**
- * Simple builder to create an Elasticsearch Client
+ * Simple configuration bean to create an Elasticsearch Client
  */
-public class ElasticClientBuilder {
+public class ElasticClientConfig {
 
     public static final String PROPERTY_CLUSTER_NAME = "cluster.name";
 
@@ -23,33 +23,27 @@ public class ElasticClientBuilder {
      * Set the clustername, matching the 'cluster.name' variable of your Elasticsearch instance
      *
      * @param clusterName the cluster name of the Elasticsearch instance
-     * @return a reference to this builder
      */
-    public ElasticClientBuilder clusterName(String clusterName) {
+    public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
-        return this;
     }
 
     /**
      * Set the domain name of the Elasticsearch instance we want to connect to
      *
      * @param domainName the domain name of the Elasticsearch instance
-     * @return a reference to this builder
      */
-    public ElasticClientBuilder domainName(String domainName) {
+    public void setDomainName(String domainName) {
         this.domainName = domainName;
-        return this;
     }
 
     /**
      * Set the port of your Elasticsearch instance (default: 9200)
      *
      * @param port the port of the Elasticsearch instance
-     * @return a reference to this builder
      */
-    public ElasticClientBuilder port(int port) {
+    public void setPort(int port) {
         this.port = port;
-        return this;
     }
 
     /**

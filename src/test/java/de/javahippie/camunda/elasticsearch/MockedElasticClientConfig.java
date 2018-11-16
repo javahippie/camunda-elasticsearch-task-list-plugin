@@ -13,13 +13,15 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.index.Index;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.mockito.Mockito;
 
 import java.util.Map;
 
-public class MockedElasticClientBuilder extends ElasticClientBuilder {
+/**
+ * Mocked instance of the ElasticClientConfig which can be injected into the Process Engine plugin in the camunda.cfg.xml
+ */
+public class MockedElasticClientConfig extends ElasticClientConfig {
 
     public final MockedElasticClient client = new MockedElasticClient();
 
@@ -50,7 +52,7 @@ public class MockedElasticClientBuilder extends ElasticClientBuilder {
 
     public class MockedElasticClient extends PreBuiltTransportClient {
 
-        public  MockedElasticClient() {
+        public MockedElasticClient() {
             super(Settings.EMPTY);
         }
 

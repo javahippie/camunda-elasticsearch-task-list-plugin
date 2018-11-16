@@ -1,6 +1,6 @@
 package de.javahippie.camunda;
 
-import de.javahippie.camunda.elasticsearch.MockedElasticClientBuilder;
+import de.javahippie.camunda.elasticsearch.MockedElasticClientConfig;
 import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -39,10 +39,10 @@ public class InMemoryH2Test {
         LogFactory.useSlf4jLogging(); // MyBatis
     }
 
-    private MockedElasticClientBuilder builder;
+    private MockedElasticClientConfig builder;
 
     @Before
-    public void setup() throws UnknownHostException {
+    public void setup() {
         Optional<BpmnParseListener> parseListener = rule.getProcessEngineConfiguration()
                 .getCustomPostBPMNParseListeners()
                 .stream()
@@ -50,7 +50,7 @@ public class InMemoryH2Test {
                 .findFirst();
 
         ElasticsearchTaskParseListener listener = (ElasticsearchTaskParseListener) parseListener.get();
-        this.builder = (MockedElasticClientBuilder) listener.getElasticsearchClientBuilder();
+        this.builder = (MockedElasticClientConfig) listener.getElasticClientConfig();
 
         init(rule.getProcessEngine());
     }

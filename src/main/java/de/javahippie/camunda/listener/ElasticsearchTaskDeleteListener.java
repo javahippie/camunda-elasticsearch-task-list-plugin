@@ -7,6 +7,9 @@ import org.elasticsearch.client.Client;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * Updates an existing document with the taskId as ID every time when a task is deleted or completed.
+ */
 public class ElasticsearchTaskDeleteListener extends AbstractElasticsearchTaskListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskDeleteListener.class.getName());

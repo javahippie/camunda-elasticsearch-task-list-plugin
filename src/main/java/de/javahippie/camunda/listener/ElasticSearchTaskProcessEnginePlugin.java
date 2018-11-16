@@ -1,18 +1,20 @@
 package de.javahippie.camunda.listener;
 
-import de.javahippie.camunda.elasticsearch.ElasticClientBuilder;
+import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Process Engine Plugin which communicates state changes regarding User Tasks to an Elasticsearh instance
+ */
 public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin {
 
-    private ElasticClientBuilder builder;
+    private ElasticClientConfig config;
 
     @Override
     public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -22,10 +24,8 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
             processEngineConfiguration.setCustomPostBPMNParseListeners(postParseListeners);
         }
         ElasticsearchTaskParseListener listener = new ElasticsearchTaskParseListener();
-        listener.setElasticsearchClientBuilder(builder
-                .clusterName("docker-cluster")
-                .domainName("localhost")
-                .port(9300));
+
+        listener.setElasticClientConfig(config);
         postParseListeners.add(listener);
     }
 
@@ -39,7 +39,12 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
         //Nothing to do
     }
 
-    public void setBuilder(ElasticClientBuilder builder) {
-        this.builder = builder;
+    /**
+     * Set the configuration of the Elasticsearch instance. Should be configured from camunda.cfg.xml.
+     * Needs to be called before the preInit() call!
+     * @param config Basic configuration for the Elastic Search client
+     */
+    public void setConfig(ElasticClientConfig config) {
+        this.config = config;
     }
 }

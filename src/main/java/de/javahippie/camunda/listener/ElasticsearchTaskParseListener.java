@@ -3,7 +3,7 @@ package de.javahippie.camunda.listener;
 import java.net.UnknownHostException;
 import java.util.logging.Logger;
 
-import de.javahippie.camunda.elasticsearch.ElasticClientBuilder;
+import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -15,23 +15,30 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.elasticsearch.client.Client;
 
+/**
+ * This parse listener attaches the TaskListeners that interact with ElasticSearch on every User Task.
+ */
 public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener implements BpmnParseListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskParseListener.class.getName());
-    private ElasticClientBuilder elasticsearchClientBuilder;
+    private ElasticClientConfig elasticClientConfig;
 
-    public void setElasticsearchClientBuilder(ElasticClientBuilder elasticsearchClientBuilder) {
-        this.elasticsearchClientBuilder = elasticsearchClientBuilder;
+    /**
+     * Set the simple configuration properties for the Elastic Search client. Needs to be set before parseUserTask()
+     * @param elasticClientConfig The basic configuration data
+     */
+    public void setElasticClientConfig(ElasticClientConfig elasticClientConfig) {
+        this.elasticClientConfig = elasticClientConfig;
     }
 
-    public ElasticClientBuilder getElasticsearchClientBuilder() {
-        return elasticsearchClientBuilder;
+    public ElasticClientConfig getElasticClientConfig() {
+        return elasticClientConfig;
     }
 
     @Override
     public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
         try {
-            Client elasticSearchClient = elasticsearchClientBuilder.build();
+            Client elasticSearchClient = elasticClientConfig.build();
             LOGGER.info("Adding Task Listener to User Task:"
                     + " activityId=" + activity.getId()
                     + ", activityName='" + activity.getName() + "'"

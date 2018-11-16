@@ -10,6 +10,9 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.Index;
 
+/**
+ * Updates an existing document with the taskId as ID every time when a task is created.
+ */
 public class ElasticsearchTaskCreateListener extends AbstractElasticsearchTaskListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskCreateListener.class.getName());
