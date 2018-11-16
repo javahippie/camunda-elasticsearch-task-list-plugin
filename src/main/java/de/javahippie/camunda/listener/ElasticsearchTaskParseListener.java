@@ -40,7 +40,7 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener im
         if (behavior instanceof UserTaskActivityBehavior) {
             TaskDefinition taskDefinition = ((UserTaskActivityBehavior) behavior).getTaskDefinition();
             taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(elasticsearchClient));
-            taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskCompleteListener(elasticsearchClient));
+            taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(elasticsearchClient));
             taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(elasticsearchClient));
             taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(elasticsearchClient));
         }

@@ -1,10 +1,14 @@
 package de.javahippie.camunda.listener;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.Index;
 
 public class ElasticsearchTaskCreateListener extends AbstractElasticsearchTaskListener {
 
@@ -22,6 +26,18 @@ public class ElasticsearchTaskCreateListener extends AbstractElasticsearchTaskLi
                 + ", taskId=" + task.getId()
                 + ", assignee='" + task.getAssignee() + "'"
                 + ", candidateGroups='" + task.getCandidates() + "'");
+
+        IndexRequest request = createIndexRequestFromDelegateTask(task);
+        getElasticSearchClient().index(request);
+    }
+
+    private IndexRequest createIndexRequestFromDelegateTask(DelegateTask delegateTask) {
+        Map<String, Object> variableMap = delegateTask.getVariables();
+        variableMap.put("taskName", delegateTask.getName());
+        variableMap.put("assignee", delegateTask.getAssignee());
+        return getElasticSearchClient().prepareIndex("camunda-ex", "_doc", delegateTask.getId())
+                .setSource(variableMap)
+                .request();
     }
 
 }

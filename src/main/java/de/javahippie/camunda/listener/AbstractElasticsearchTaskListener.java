@@ -14,4 +14,5 @@ public abstract class AbstractElasticsearchTaskListener implements TaskListener 
     protected Client getElasticSearchClient() {
         return this.elasticSearchClient;
     }
+
 }

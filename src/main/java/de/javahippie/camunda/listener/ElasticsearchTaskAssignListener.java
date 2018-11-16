@@ -1,10 +1,10 @@
 package de.javahippie.camunda.listener;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.TaskListener;
+import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
 
-import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ElasticsearchTaskAssignListener extends AbstractElasticsearchTaskListener {
@@ -23,6 +23,17 @@ public class ElasticsearchTaskAssignListener extends AbstractElasticsearchTaskLi
                 + ", taskId=" + task.getId()
                 + ", assignee='" + task.getAssignee() + "'"
                 + ", candidateGroups='" + task.getCandidates() + "'");
+
+        UpdateRequest updateRequest = createUpdateRequestFromDelegateTask(task);
+        getElasticSearchClient().update(updateRequest);
     }
 
+    private UpdateRequest createUpdateRequestFromDelegateTask(DelegateTask delegateTask) {
+        Map<String, Object> variableMap = delegateTask.getVariables();
+        variableMap.put("taskName", delegateTask.getName());
+        variableMap.put("assignee", delegateTask.getAssignee());
+        return getElasticSearchClient().prepareUpdate("camunda-ex", "_doc", delegateTask.getId())
+                .setDoc(variableMap)
+                .request();
+    }
 }

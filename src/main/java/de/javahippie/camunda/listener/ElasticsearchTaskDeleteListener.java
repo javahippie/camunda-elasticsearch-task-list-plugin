@@ -1,9 +1,10 @@
 package de.javahippie.camunda.listener;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
-import org.camunda.bpm.engine.delegate.TaskListener;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.client.Client;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 public class ElasticsearchTaskDeleteListener extends AbstractElasticsearchTaskListener {
@@ -22,6 +23,16 @@ public class ElasticsearchTaskDeleteListener extends AbstractElasticsearchTaskLi
                 + ", taskId=" + task.getId()
                 + ", assignee='" + task.getAssignee() + "'"
                 + ", candidateGroups='" + task.getCandidates() + "'");
+        DeleteRequest request = createDeleteRequestFromDelegateTask(task);
+        getElasticSearchClient().delete(request);
+    }
+
+    private DeleteRequest createDeleteRequestFromDelegateTask(DelegateTask delegateTask) {
+        Map<String, Object> variableMap = delegateTask.getVariables();
+        variableMap.put("taskName", delegateTask.getName());
+        variableMap.put("assignee", delegateTask.getAssignee());
+        return getElasticSearchClient().prepareDelete("camunda-ex", "_doc", delegateTask.getId())
+                .request();
     }
 
 }
