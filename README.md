@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/javahippie/camunda-elasticsearch-task-list-plugin.svg?branch=master)](https://travis-ci.org/javahippie/camunda-elasticsearch-task-list-plugin)
+
 # Camunda BPM Process Engine Plugin
 A Plugin for [Camunda BPM](http://docs.camunda.org).
 
