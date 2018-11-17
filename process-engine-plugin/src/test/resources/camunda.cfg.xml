@@ -12,14 +12,10 @@
         </property>
         <property name="processEnginePlugins">
             <list>
-                <bean class="de.javahippie.camunda.listener.ElasticSearchTaskProcessEnginePlugin">
-                    <property name="config">
-                        <bean class="de.javahippie.camunda.elasticsearch.MockedElasticClientConfig">
-                            <property name="clusterName" value="docker-cluster"/>
-                            <property name="port" value="9300"/>
-                            <property name="domainName" value="localhost"/>
-                        </bean>
-                    </property>
+                <bean class="de.javahippie.camunda.ElasticSearchTaskProcessEnginePlugin">
+                    <property name="clusterName" value="docker-cluster"/>
+                    <property name="port" value="9300"/>
+                    <property name="domainName" value="localhost"/>
                 </bean>
             </list>
         </property>

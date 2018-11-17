@@ -1,6 +1,6 @@
-package de.javahippie.camunda.listener;
+package de.javahippie.camunda;
 
-import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
+import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -14,7 +14,9 @@ import java.util.List;
  */
 public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin {
 
-    private ElasticClientConfig config;
+    private String domainName;
+    private int port;
+    private String clusterName;
 
     @Override
     public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -23,10 +25,7 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
             postParseListeners = new ArrayList<>();
             processEngineConfiguration.setCustomPostBPMNParseListeners(postParseListeners);
         }
-        ElasticsearchTaskParseListener listener = new ElasticsearchTaskParseListener();
-
-        listener.setElasticClientConfig(config);
-        postParseListeners.add(listener);
+        postParseListeners.add(new ElasticsearchTaskParseListener(domainName, port, clusterName));
     }
 
     @Override
@@ -39,12 +38,15 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
         //Nothing to do
     }
 
-    /**
-     * Set the configuration of the Elasticsearch instance. Should be configured from camunda.cfg.xml.
-     * Needs to be called before the preInit() call!
-     * @param config Basic configuration for the Elastic Search client
-     */
-    public void setConfig(ElasticClientConfig config) {
-        this.config = config;
+    public void setDomainName(String domainName) {
+        this.domainName = domainName;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setClusterName(String clusterName) {
+        this.clusterName = clusterName;
     }
 }

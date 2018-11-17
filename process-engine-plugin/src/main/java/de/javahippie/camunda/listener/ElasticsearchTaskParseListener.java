@@ -1,9 +1,13 @@
 package de.javahippie.camunda.listener;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
+import de.javahippie.camunda.elasticsearch.ElasticClientLiveConfig;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -21,14 +25,13 @@ import org.elasticsearch.client.Client;
 public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener implements BpmnParseListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskParseListener.class.getName());
-    private ElasticClientConfig elasticClientConfig;
+    private final ElasticClientConfig elasticClientConfig;
 
-    /**
-     * Set the simple configuration properties for the Elastic Search client. Needs to be set before parseUserTask()
-     * @param elasticClientConfig The basic configuration data
-     */
-    public void setElasticClientConfig(ElasticClientConfig elasticClientConfig) {
-        this.elasticClientConfig = elasticClientConfig;
+    public ElasticsearchTaskParseListener(String domainName, int port, String clusterName) {
+        this.elasticClientConfig = loadElasticClientConfigFromClassPath();
+        this.elasticClientConfig.setDomainName(domainName);
+        this.elasticClientConfig.setPort(port);
+        this.elasticClientConfig.setClusterName(clusterName);
     }
 
     public ElasticClientConfig getElasticClientConfig() {
@@ -58,7 +61,12 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener im
             throw new RuntimeException(e);
         }
 
-
     }
 
+    private ElasticClientConfig loadElasticClientConfigFromClassPath() {
+        ServiceLoader<ElasticClientConfig> loader = ServiceLoader.load(ElasticClientConfig.class);
+        List<ElasticClientConfig> configurations = new ArrayList<>();
+        loader.forEach(configurations::add);
+        return configurations.get(0);
+    }
 }

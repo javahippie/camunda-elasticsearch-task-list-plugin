@@ -19,11 +19,27 @@ import org.mockito.Mockito;
 import java.util.Map;
 
 /**
- * Mocked instance of the ElasticClientConfig which can be injected into the Process Engine plugin in the camunda.cfg.xml
+ * Mocked instance of the ElasticClientLiveConfig which can be injected into
+ * the Process Engine plugin in the camunda.cfg.xml
  */
-public class MockedElasticClientConfig extends ElasticClientConfig {
+public class MockedElasticClientConfig implements ElasticClientConfig {
 
     public final MockedElasticClient client = new MockedElasticClient();
+
+    @Override
+    public void setClusterName(String clusterName) {
+        //do nothing
+    }
+
+    @Override
+    public void setDomainName(String domainName) {
+        //do nothing
+    }
+
+    @Override
+    public void setPort(int port) {
+        //do nothing
+    }
 
     @Override
     public Client build() {
