@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_052kw2y" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="2.0.3">
+  <bpmn:process id="customer-defaulting-process" name="Customer Defaulting Process" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="Customer is defaulting">
+      <bpmn:outgoing>SequenceFlow_0auvvdy</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0auvvdy" sourceRef="StartEvent_1" targetRef="Task_1i16kx3" />
+    <bpmn:userTask id="Task_1i16kx3" name="Enter details">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="FormField_reason" label="Defaulting Reasons" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>SequenceFlow_0auvvdy</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0thexdw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0thexdw" sourceRef="Task_1i16kx3" targetRef="Task_1899pvf" />
+    <bpmn:userTask id="Task_1899pvf" name="Verify Details">
+      <bpmn:incoming>SequenceFlow_0thexdw</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0x1oomq</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="SequenceFlow_0x1oomq" sourceRef="Task_1899pvf" targetRef="Task_0v02n6o" />
+    <bpmn:serviceTask id="Task_0v02n6o" name="Send details" camunda:delegateExpression="${fakeDelegate}">
+      <bpmn:incoming>SequenceFlow_0x1oomq</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0oxdnko</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_0p8nf9c">
+      <bpmn:incoming>SequenceFlow_0oxdnko</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="SequenceFlow_0oxdnko" sourceRef="Task_0v02n6o" targetRef="EndEvent_0p8nf9c" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="customer-defaulting-process">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="162" y="145" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0auvvdy_di" bpmnElement="SequenceFlow_0auvvdy">
+        <di:waypoint x="209" y="120" />
+        <di:waypoint x="292" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_1fqvrxl_di" bpmnElement="Task_1i16kx3">
+        <dc:Bounds x="292" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0thexdw_di" bpmnElement="SequenceFlow_0thexdw">
+        <di:waypoint x="392" y="120" />
+        <di:waypoint x="475" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="UserTask_0anbcku_di" bpmnElement="Task_1899pvf">
+        <dc:Bounds x="475" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0x1oomq_di" bpmnElement="SequenceFlow_0x1oomq">
+        <di:waypoint x="575" y="120" />
+        <di:waypoint x="658" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0d1qkds_di" bpmnElement="Task_0v02n6o">
+        <dc:Bounds x="658" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0p8nf9c_di" bpmnElement="EndEvent_0p8nf9c">
+        <dc:Bounds x="841" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0oxdnko_di" bpmnElement="SequenceFlow_0oxdnko">
+        <di:waypoint x="758" y="120" />
+        <di:waypoint x="841" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
