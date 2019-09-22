@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.javahippie.camunda</groupId>
-    <artifactId>elasticsearch-task-plugin</artifactId>
+    <artifactId>elasticsearch-task-plugin-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
     <name>elasticsearch-task-plugin</name>
-    <description>Demo project for Spring Cloud Stack</description>
+    <description>Demo project for a Camunda Process Engine Plugin</description>
     <packaging>pom</packaging>
 
     <modules>

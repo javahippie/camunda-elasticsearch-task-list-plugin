@@ -8,6 +8,7 @@
 		<version>2.1.8.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>de.javahippie.camunda</groupId>
 	<artifactId>elasticsearch-task-tester</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -40,6 +41,13 @@
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>de.javahippie.camunda</groupId>
+			<artifactId>process-engine-plugin</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
