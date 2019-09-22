@@ -13,6 +13,7 @@
 
     <modules>
         <module>process-engine-plugin</module>
+        <module>testapplication</module>
     </modules>
 
     <properties>

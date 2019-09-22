@@ -1,13 +1,6 @@
 package de.javahippie.camunda.listener;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
-import java.util.logging.Logger;
-
 import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
-import de.javahippie.camunda.elasticsearch.ElasticClientLiveConfig;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -18,6 +11,13 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.elasticsearch.client.Client;
+
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This parse listener attaches the TaskListeners that interact with ElasticSearch on every User Task.
@@ -57,8 +57,7 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener im
                 taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(elasticSearchClient));
             }
         } catch (UnknownHostException e) {
-            //FIXME: uncool
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Could not establish a connection the the Elasticsearch instance - unknown Host", e);
         }
 
     }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Process Engine Plugin which communicates state changes regarding User Tasks to an Elasticsearh instance
+ * Process Engine Plugin which communicates state changes regarding User Tasks to an Elasticsearch instance
  */
 public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin {
 
@@ -21,7 +21,7 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
     @Override
     public void preInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
         List<BpmnParseListener> postParseListeners = processEngineConfiguration.getCustomPostBPMNParseListeners();
-        if (postParseListeners == null) {
+        if (null == postParseListeners) {
             postParseListeners = new ArrayList<>();
             processEngineConfiguration.setCustomPostBPMNParseListeners(postParseListeners);
         }
@@ -30,12 +30,12 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
 
     @Override
     public void postInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        //Nothing to do
+        // We don't do anything in the postInit
     }
 
     @Override
     public void postProcessEngineBuild(ProcessEngine processEngine) {
-        //Nothing to do
+        // We don't do anything in the preInit
     }
 
     public void setDomainName(String domainName) {

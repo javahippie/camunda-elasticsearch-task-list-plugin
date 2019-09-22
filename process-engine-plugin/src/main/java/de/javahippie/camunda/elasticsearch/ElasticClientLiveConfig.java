@@ -17,7 +17,7 @@ public class ElasticClientLiveConfig implements ElasticClientConfig {
 
     private String clusterName;
     private String domainName;
-    private int port;
+    private int port = 9200;
 
     /**
      * Set the clustername, matching the 'cluster.name' variable of your Elasticsearch instance
