@@ -10,6 +10,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +27,7 @@ import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 /**
  * Test case starting an in-memory database-backed Process Engine.
  */
-@RunWith(MockitoJUnitRunner.class)
+@Ignore
 public class InMemoryH2Test {
 
     @ClassRule
@@ -50,7 +51,7 @@ public class InMemoryH2Test {
                 .findFirst();
 
         ElasticsearchTaskParseListener listener = (ElasticsearchTaskParseListener) parseListener.get();
-        this.builder = (MockedElasticClientConfig) listener.getElasticClientConfig();
+        //this.builder = (MockedElasticClientConfig) listener.getElasticClientConfig();
 
         init(rule.getProcessEngine());
     }

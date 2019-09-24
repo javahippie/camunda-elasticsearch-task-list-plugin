@@ -15,7 +15,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -24,40 +23,33 @@ import java.util.logging.Logger;
 public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener {
 
     private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskParseListener.class.getName());
-    private final ElasticClientConfig elasticClientConfig;
 
-    public ElasticsearchTaskParseListener(String domainName, int port, String clusterName) {
-        this.elasticClientConfig = loadElasticClientConfigFromClassPath();
-        this.elasticClientConfig.setDomainName(domainName);
-        this.elasticClientConfig.setPort(port);
-        this.elasticClientConfig.setClusterName(clusterName);
-    }
+    private final Client elasticSearchClient;
 
-    public ElasticClientConfig getElasticClientConfig() {
-        return elasticClientConfig;
+    public ElasticsearchTaskParseListener(String domainName, int port, String clusterName) throws UnknownHostException {
+        ElasticClientConfig elasticClientConfig = loadElasticClientConfigFromClassPath();
+        elasticClientConfig.setDomainName(domainName);
+        elasticClientConfig.setPort(port);
+        elasticClientConfig.setClusterName(clusterName);
+
+        this.elasticSearchClient = elasticClientConfig.build();
     }
 
     @Override
     public void parseUserTask(Element userTaskElement, ScopeImpl scope, ActivityImpl activity) {
-        try {
-            Client elasticSearchClient = elasticClientConfig.build();
-            LOGGER.info("Adding Task Listener to User Task:"
-                    + " activityId=" + activity.getId()
-                    + ", activityName='" + activity.getName() + "'"
-                    + ", scopeId=" + scope.getId()
-                    + ", scopeName=" + scope.getName());
 
-            ActivityBehavior behavior = activity.getActivityBehavior();
-            if (behavior instanceof UserTaskActivityBehavior) {
-                TaskDefinition taskDefinition = ((UserTaskActivityBehavior) behavior).getTaskDefinition();
-                taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(elasticSearchClient));
-                taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(elasticSearchClient));
-                taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(elasticSearchClient));
-                taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(elasticSearchClient));
-            }
-        } catch (UnknownHostException e) {
-            LOGGER.log(Level.SEVERE, "Could not establish a connection the the Elasticsearch instance - unknown Host", e);
-        }
+        LOGGER.info("Adding Task Listener to User Task:"
+                + " activityId=" + activity.getId()
+                + ", activityName='" + activity.getName() + "'"
+                + ", scopeId=" + scope.getId()
+                + ", scopeName=" + scope.getName());
+
+        ActivityBehavior behavior = activity.getActivityBehavior(); // Will always be a UserTaskActivityBehavior
+        TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(this.elasticSearchClient));
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(this.elasticSearchClient));
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(this.elasticSearchClient));
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(this.elasticSearchClient));
 
     }
 

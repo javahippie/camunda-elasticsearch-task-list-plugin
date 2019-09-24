@@ -6,13 +6,18 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Process Engine Plugin which communicates state changes regarding User Tasks to an Elasticsearch instance
  */
 public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin {
+
+    private final Logger LOGGER = Logger.getLogger(ElasticSearchTaskProcessEnginePlugin.class.getName());
 
     private String domainName;
     private int port;
@@ -25,7 +30,11 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
             postParseListeners = new ArrayList<>();
             processEngineConfiguration.setCustomPostBPMNParseListeners(postParseListeners);
         }
-        postParseListeners.add(new ElasticsearchTaskParseListener(domainName, port, clusterName));
+        try {
+            postParseListeners.add(new ElasticsearchTaskParseListener(domainName, port, clusterName));
+        } catch (UnknownHostException e) {
+            LOGGER.log(Level.SEVERE, "Could not establish a connection the the Elasticsearch instance - unknown Host", e);
+        }
     }
 
     @Override
