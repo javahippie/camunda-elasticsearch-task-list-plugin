@@ -12,13 +12,11 @@ public class AppConfig {
 
     @Bean
     @Order(Ordering.DEFAULT_ORDER + 1)
-    public static ProcessEnginePlugin myCustomConfiguration() {
+    public static ProcessEnginePlugin registerProcessEnginePlugin() {
         ElasticSearchTaskProcessEnginePlugin elasticSearchPlugin = new ElasticSearchTaskProcessEnginePlugin();
-
         elasticSearchPlugin.setClusterName("docker-cluster");
         elasticSearchPlugin.setDomainName("localhost");
         elasticSearchPlugin.setPort(9300);
-
         return elasticSearchPlugin;
     }
 }
