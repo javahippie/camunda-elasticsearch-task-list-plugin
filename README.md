@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/javahippie/camunda-elasticsearch-task-list-plugin.svg?branch=master)](https://travis-ci.org/javahippie/camunda-elasticsearch-task-list-plugin)
 
 # Camunda Elasticsearch Task List Process Engine Plugin
+**Work in progress**
+
 A Plugin for [Camunda BPM](http://docs.camunda.org) which automatically forwards all updates regarding user Tasks (create, assign, complete, delete) including their variables to an Elasticsearch instance. This enables users to full-text-search the existing tasks in a reasonable amount of time. 
 
 ## How to use it?

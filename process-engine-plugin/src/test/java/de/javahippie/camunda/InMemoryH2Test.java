@@ -3,6 +3,7 @@ package de.javahippie.camunda;
 import de.javahippie.camunda.elasticsearch.MockedElasticClientConfig;
 import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.apache.ibatis.logging.LogFactory;
+import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -44,6 +45,7 @@ public class InMemoryH2Test {
 
     @Before
     public void setup() {
+
         Optional<BpmnParseListener> parseListener = rule.getProcessEngineConfiguration()
                 .getCustomPostBPMNParseListeners()
                 .stream()
