@@ -1,9 +1,7 @@
 package de.javahippie.camunda;
 
 import de.javahippie.camunda.elasticsearch.MockedElasticClientConfig;
-import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.apache.ibatis.logging.LogFactory;
-import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;

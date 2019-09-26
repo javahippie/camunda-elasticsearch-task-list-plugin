@@ -1,6 +1,8 @@
 package de.javahippie.camunda.listener;
 
-import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
+import de.javahippie.camunda.listener.task.ElasticsearchTaskAssignListener;
+import de.javahippie.camunda.listener.task.ElasticsearchTaskDeleteListener;
+import de.javahippie.camunda.listener.task.ElasticsearchTaskIndexListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
@@ -11,22 +13,18 @@ import org.camunda.bpm.engine.impl.task.TaskDefinition;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.elasticsearch.client.Client;
 
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 /**
  * This parse listener attaches the TaskListeners that interact with ElasticSearch on every User Task.
  */
-public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener {
+public class ElasticsearchParseListener extends AbstractBpmnParseListener {
 
-    private final Logger LOGGER = Logger.getLogger(ElasticsearchTaskParseListener.class.getName());
+    private final Logger LOGGER = Logger.getLogger(ElasticsearchParseListener.class.getName());
 
     private final Client elasticSearchClient;
 
-    public ElasticsearchTaskParseListener(Client elasticSearchClient) {
+    public ElasticsearchParseListener(Client elasticSearchClient) {
         this.elasticSearchClient = elasticSearchClient;
     }
 
@@ -43,7 +41,7 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener {
         TaskDefinition taskDefinition = ((UserTaskActivityBehavior) activity.getActivityBehavior()).getTaskDefinition();
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, new ElasticsearchTaskAssignListener(this.elasticSearchClient));
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_COMPLETE, new ElasticsearchTaskDeleteListener(this.elasticSearchClient));
-        taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskCreateListener(this.elasticSearchClient));
+        taskDefinition.addTaskListener(TaskListener.EVENTNAME_CREATE, new ElasticsearchTaskIndexListener(this.elasticSearchClient));
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_DELETE, new ElasticsearchTaskDeleteListener(this.elasticSearchClient));
 
     }

@@ -1,12 +1,11 @@
 package de.javahippie.camunda;
 
 import de.javahippie.camunda.elasticsearch.ElasticClientConfig;
-import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
+import de.javahippie.camunda.listener.ElasticsearchParseListener;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
-import org.elasticsearch.client.Client;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -37,7 +36,7 @@ public class ElasticSearchTaskProcessEnginePlugin implements ProcessEnginePlugin
         }
         try {
             this.elasticClientConfig = loadElasticSearchClientConfig(domainName, port, clusterName);
-            postParseListeners.add(new ElasticsearchTaskParseListener(elasticClientConfig.build()));
+            postParseListeners.add(new ElasticsearchParseListener(elasticClientConfig.build()));
             LOGGER.log(Level.INFO, "Instantiated Elasticsearch client");
         } catch (UnknownHostException e) {
             LOGGER.log(Level.SEVERE, "Could not establish a connection the the Elasticsearch instance - unknown Host", e);
