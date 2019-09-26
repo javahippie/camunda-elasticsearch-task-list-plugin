@@ -1,9 +1,8 @@
 package de.javahippie.camunda.listener.task;
 
-import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.elasticsearch.client.Client;
 
-import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * Updates an existing document with the taskId as ID every time when a task is deleted or completed.
@@ -15,7 +14,7 @@ public class ElasticsearchTaskDeleteListener extends AbstractElasticsearchTaskLi
     }
 
     @Override
-    void processElasticSearchRequest(DelegateTask task) {
-        super.delete(task.getId());
+    void processElasticSearchRequest(String taskId, Map<String, Object> variableMap) {
+        super.delete(taskId);
     }
 }

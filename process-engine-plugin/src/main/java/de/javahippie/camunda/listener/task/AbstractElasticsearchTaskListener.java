@@ -34,10 +34,8 @@ public abstract class AbstractElasticsearchTaskListener implements TaskListener 
 
     /**
      * Custom logic for the separate listeners goes here.
-     *
-     * @param task The task, which is handed to this TaskListener
      */
-    abstract void processElasticSearchRequest(DelegateTask task);
+    abstract void processElasticSearchRequest(String taskId, Map<String, Object> variables);
 
     @Override
     public void notify(DelegateTask delegateTask) {
@@ -48,7 +46,11 @@ public abstract class AbstractElasticsearchTaskListener implements TaskListener 
                 + ", assignee='" + delegateTask.getAssignee() + "'"
                 + ", candidateGroups='" + delegateTask.getCandidates() + "'");
 
-        registerTransactionListener(commandContext -> processElasticSearchRequest(delegateTask));
+        Map<String, Object> variables = delegateTask.getVariables();
+        variables.put(TASK_NAME_ATTRIBUTE, delegateTask.getName());
+        variables.put(ASSIGNEE_ATTRIBUTE, delegateTask.getAssignee());
+
+        registerTransactionListener(commandContext -> processElasticSearchRequest(delegateTask.getId(), variables));
     }
 
     protected void index(String taskId, Map<String, Object> variables) {
