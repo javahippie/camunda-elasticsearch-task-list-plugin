@@ -26,13 +26,8 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener {
 
     private final Client elasticSearchClient;
 
-    public ElasticsearchTaskParseListener(String domainName, int port, String clusterName) throws UnknownHostException {
-        ElasticClientConfig elasticClientConfig = loadElasticClientConfigFromClassPath();
-        elasticClientConfig.setDomainName(domainName);
-        elasticClientConfig.setPort(port);
-        elasticClientConfig.setClusterName(clusterName);
-
-        this.elasticSearchClient = elasticClientConfig.build();
+    public ElasticsearchTaskParseListener(Client elasticSearchClient) {
+        this.elasticSearchClient = elasticSearchClient;
     }
 
     @Override
@@ -53,10 +48,4 @@ public class ElasticsearchTaskParseListener extends AbstractBpmnParseListener {
 
     }
 
-    private ElasticClientConfig loadElasticClientConfigFromClassPath() {
-        ServiceLoader<ElasticClientConfig> loader = ServiceLoader.load(ElasticClientConfig.class);
-        List<ElasticClientConfig> configurations = new ArrayList<>();
-        loader.forEach(configurations::add);
-        return configurations.get(0);
-    }
 }

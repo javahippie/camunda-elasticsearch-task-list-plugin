@@ -3,32 +3,32 @@ package de.javahippie.camunda;
 import de.javahippie.camunda.elasticsearch.MockedElasticClientConfig;
 import de.javahippie.camunda.listener.ElasticsearchTaskParseListener;
 import org.apache.ibatis.logging.LogFactory;
-import org.camunda.bpm.dmn.engine.test.DmnEngineRule;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.complete;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.init;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.processEngine;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.task;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.taskService;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
  */
-@Ignore
 public class InMemoryH2Test {
 
     @ClassRule
@@ -46,14 +46,14 @@ public class InMemoryH2Test {
     @Before
     public void setup() {
 
-        Optional<BpmnParseListener> parseListener = rule.getProcessEngineConfiguration()
-                .getCustomPostBPMNParseListeners()
+        Optional<ProcessEnginePlugin> elasticSearchplugin = rule.getProcessEngineConfiguration()
+                .getProcessEnginePlugins()
                 .stream()
-                .filter(bpmnParseListener -> bpmnParseListener instanceof ElasticsearchTaskParseListener)
-                .findFirst();
+                .filter(plugin -> plugin instanceof ElasticSearchTaskProcessEnginePlugin).findFirst();
 
-        ElasticsearchTaskParseListener listener = (ElasticsearchTaskParseListener) parseListener.get();
-        //this.builder = (MockedElasticClientConfig) listener.getElasticClientConfig();
+
+        ElasticSearchTaskProcessEnginePlugin plugin = (ElasticSearchTaskProcessEnginePlugin) elasticSearchplugin.get();
+        this.builder = (MockedElasticClientConfig) plugin.getElasticClientConfig();
 
         init(rule.getProcessEngine());
     }
